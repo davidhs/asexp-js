@@ -206,7 +206,5 @@ export function parse(text) {
   /** @type {ASExpression[]} */
   const as_expressions = stack.pop();
 
-  console.log("AS Expressions:", JSON.stringify(as_expressions, null, 2));
-
   return as_expressions;
 }
