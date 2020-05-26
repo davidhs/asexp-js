@@ -1,3 +1,5 @@
+// Git repository: <https://github.com/davidhs/asexp-js>
+
 /**
  * NOTE(Davíð): I'm going to leave this here if Visual Studio Code (or some 
  * other editor) and JSDoc ever support circular references.
