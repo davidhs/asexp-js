@@ -1,5 +1,12 @@
-/// <reference path="asexp.types.d.ts" />
-
+/**
+ * NOTE(Davíð): I'm going to leave this here if Visual Studio Code (or some 
+ * other editor) and JSDoc ever support circular references.
+ * 
+ * @typedef {{ v: string, li: number, ci: number}} Token
+ * @typedef {string} ASExpressionSymbol
+ * @typedef {ASExpression[]} ASExpressionList
+ * @typedef {ASExpressionSymbol | ASExpressionList} ASExpression
+ */
 
 const ws = /\s/;
 
@@ -16,9 +23,7 @@ const STATE_STRING = 3;
  * @param {string} message 
  */
 function cem(text, token, message = "") {
-  if (token === null) {
-    return message;
-  }
+  if (token === null) return message;
 
   const line_index = token.li;
   const column_index = token.ci;
@@ -59,7 +64,6 @@ function cem(text, token, message = "") {
 function create_new_token(line_index, column_index) {
   return { v: "", li: line_index, ci: column_index }
 }
-
 
 /**
  * 
@@ -130,15 +134,11 @@ function tokenize(text) {
 
         state = STATE_STRING;
       } else {
-        if (token === null) {
-          token = create_new_token(line_index, column_index);
-        }
+        if (token === null) token = create_new_token(line_index, column_index);
         token.v += c;
       }
     } else if (state === STATE_COMMENT) {
-      if (c === "\n") {
-        state = STATE_NORMAL;
-      }
+      if (c === "\n") state = STATE_NORMAL;
     } else if (state === STATE_STRING) {
       token.v += c;
 
@@ -149,23 +149,17 @@ function tokenize(text) {
       }
     } else throw new Error(cem(text, token, `Internal error: unknown state: ${state}`));
 
-
-
     if (c === "\n") {
       line_index += 1;
       column_index = 0;
-    } else {
-      column_index += 1;
-    }
+    } else column_index += 1;
 
     pc = c;
   }
 
-
   if (token !== null) {
-    if (state === STATE_STRING) {
-      throw new SyntaxError(cem(text, token, `unclosed string`));
-    } else {
+    if (state === STATE_STRING) throw new SyntaxError(cem(text, token, `unclosed string`));
+    else {
       tokens.push(token);
       token = null;
     }
@@ -199,19 +193,13 @@ export function parse(text) {
       stack.push([]);
     } else if (token.v === ")") {
       if (stack.length === 1) throw new SyntaxError(cem(text, token, `unexpected closing delimiter`))
-
       list_delim_stack.pop();
       const level = stack.pop();
       stack[stack.length - 1].push(level);
-    } else {
-      stack[stack.length - 1].push(token.v);
-    }
+    } else stack[stack.length - 1].push(token.v);
   }
 
   if (stack.length !== 1) throw new SyntaxError(cem(text, list_delim_stack[list_delim_stack.length - 1], `needs a matching closing delimiter`));
-
-  
-
 
   /** @type {ASExpression[]} */
   const as_expressions = stack.pop();
